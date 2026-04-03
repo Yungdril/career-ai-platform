@@ -1,10 +1,27 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { z } from "zod";
+import {
+  getUserResumes,
+  createResume,
+  getResumeById,
+  updateResume,
+  deleteResume,
+  getUserInterviews,
+  createInterview,
+  getInterviewById,
+  updateInterview,
+  getUserLinkedinProfile,
+  createLinkedinProfile,
+  updateLinkedinProfile,
+} from "./db";
+import { resumeAnalyzerRouter } from "./features/resumeAnalyzer";
+import { interviewPrepRouter } from "./features/interviewPrep";
+import { linkedinOptimizerRouter } from "./features/linkedinOptimizer";
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +34,11 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+
+
+  linkedinOptimizer: linkedinOptimizerRouter,
+  resumeAnalyzer: resumeAnalyzerRouter,
+  interviewPrep: interviewPrepRouter,
 });
 
 export type AppRouter = typeof appRouter;

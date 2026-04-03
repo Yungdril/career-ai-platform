@@ -1,0 +1,176 @@
+import { protectedProcedure, router } from "../_core/trpc";
+import { z } from "zod";
+import { invokeLLM } from "../_core/llm";
+import { storagePut } from "../storage";
+import { createResume } from "../db";
+const pdfParse = require("pdf-parse");
+
+export const resumeAnalyzerRouter = router({
+  uploadAndAnalyze: protectedProcedure
+    .input(
+      z.object({
+        fileName: z.string(),
+        fileContent: z.instanceof(Buffer),
+        fileType: z.enum(["pdf", "docx"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // Extract text from PDF
+        let extractedText = "";
+        if (input.fileType === "pdf") {
+          try {
+            const pdfData = await (pdfParse as any)(input.fileContent);
+            extractedText = pdfData.text || "";
+          } catch (e) {
+            console.error("PDF parsing error:", e);
+            extractedText = "";
+          }
+        } else {
+          // For DOCX, we'll use a simple placeholder
+          // In production, you'd use a library like mammoth
+          extractedText = input.fileContent.toString("utf-8");
+        }
+
+        // Upload file to S3
+        const fileKey = `resumes/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+        const { url: fileUrl } = await storagePut(
+          fileKey,
+          input.fileContent,
+          input.fileType === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        );
+
+        // Analyze with AI first
+        const analysis = await analyzeResumeWithAI(extractedText);
+
+        // Create resume record with analysis
+        await createResume({
+          userId: ctx.user.id,
+          fileName: input.fileName,
+          fileKey,
+          fileUrl,
+          content: extractedText,
+          analysis: JSON.stringify(analysis),
+          atsScore: analysis.atsScore,
+        });
+
+        return {
+          success: true,
+          analysis,
+        };
+      } catch (error) {
+        console.error("Resume upload error:", error);
+        throw new Error("Failed to upload and analyze resume");
+      }
+    }),
+
+  analyzeExisting: protectedProcedure
+    .input(z.object({ resumeId: z.number() }))
+    .mutation(async ({ input }) => {
+      try {
+        // TODO: Implement re-analysis of existing resume
+        return { success: true };
+      } catch (error) {
+        console.error("Resume analysis error:", error);
+        throw new Error("Failed to analyze resume");
+      }
+    }),
+});
+
+async function analyzeResumeWithAI(resumeContent: string) {
+  const prompt = `You are an expert resume reviewer and ATS (Applicant Tracking System) specialist. Analyze the following resume and provide:
+
+1. ATS Compatibility Score (0-100): How well will this resume pass through ATS systems?
+2. Key Strengths: What are the strongest parts of this resume?
+3. Missing Keywords: What important keywords or skills are missing?
+4. Formatting Issues: Any formatting problems that could hurt ATS compatibility?
+5. Improvement Suggestions: Top 5 actionable improvements
+6. Industry-Specific Recommendations: Tailored advice for the candidate's industry
+
+Resume Content:
+${resumeContent}
+
+Provide your analysis in a structured JSON format.`;
+
+  const response = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an expert resume reviewer. Provide detailed, actionable feedback on resumes to help candidates improve their chances of getting hired.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "resume_analysis",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            atsScore: {
+              type: "integer",
+              description: "ATS compatibility score from 0-100",
+            },
+            strengths: {
+              type: "array",
+              items: { type: "string" },
+              description: "Key strengths of the resume",
+            },
+            missingKeywords: {
+              type: "array",
+              items: { type: "string" },
+              description: "Important missing keywords",
+            },
+            formattingIssues: {
+              type: "array",
+              items: { type: "string" },
+              description: "Formatting problems identified",
+            },
+            improvements: {
+              type: "array",
+              items: { type: "string" },
+              description: "Top 5 actionable improvements",
+            },
+            industryRecommendations: {
+              type: "array",
+              items: { type: "string" },
+              description: "Industry-specific recommendations",
+            },
+          },
+          required: [
+            "atsScore",
+            "strengths",
+            "missingKeywords",
+            "formattingIssues",
+            "improvements",
+            "industryRecommendations",
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  try {
+    const content = response.choices[0]?.message.content;
+    if (typeof content === "string") {
+      return JSON.parse(content);
+    }
+    return content;
+  } catch (error) {
+    console.error("Failed to parse AI response:", error);
+    return {
+      atsScore: 0,
+      strengths: [],
+      missingKeywords: [],
+      formattingIssues: [],
+      improvements: [],
+      industryRecommendations: [],
+    };
+  }
+}

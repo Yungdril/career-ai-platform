@@ -5,13 +5,23 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import ResumeAnalyzer from "./pages/ResumeAnalyzer";
+import InterviewPrep from "./pages/InterviewPrep";
+import LinkedinOptimizer from "./pages/LinkedinOptimizer";
+import Profile from "./pages/Profile";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/resume-analyzer" component={ResumeAnalyzer} />
+      <Route path="/interview-prep" component={InterviewPrep} />
+      <Route path="/linkedin-optimizer" component={LinkedinOptimizer} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

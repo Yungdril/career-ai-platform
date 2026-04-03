@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, resumes, InsertResume, interviews, InsertInterview, linkedinProfiles, InsertLinkedinProfile } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,88 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getUserResumes(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(resumes).where(eq(resumes.userId, userId));
+  return result;
+}
+
+export async function createResume(data: InsertResume) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(resumes).values(data);
+  return result;
+}
+
+export async function getResumeById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(resumes).where(eq(resumes.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateResume(id: number, data: Partial<InsertResume>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(resumes).set(data).where(eq(resumes.id, id));
+}
+
+export async function deleteResume(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(resumes).where(eq(resumes.id, id));
+}
+
+export async function getUserInterviews(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(interviews).where(eq(interviews.userId, userId));
+  return result;
+}
+
+export async function createInterview(data: InsertInterview) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(interviews).values(data);
+  return result;
+}
+
+export async function getInterviewById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(interviews).where(eq(interviews.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateInterview(id: number, data: Partial<InsertInterview>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(interviews).set(data).where(eq(interviews.id, id));
+}
+
+export async function getUserLinkedinProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(linkedinProfiles).where(eq(linkedinProfiles.userId, userId)).limit(1);
+  return result[0];
+}
+
+export async function createLinkedinProfile(data: InsertLinkedinProfile) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(linkedinProfiles).values(data);
+  return result;
+}
+
+export async function updateLinkedinProfile(id: number, data: Partial<InsertLinkedinProfile>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(linkedinProfiles).set(data).where(eq(linkedinProfiles.id, id));
+}
+
+export async function deleteLinkedinProfile(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(linkedinProfiles).where(eq(linkedinProfiles.id, id));
+}
