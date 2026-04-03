@@ -170,8 +170,13 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
+                  <img 
+                    src="https://d2xsxph8kpxj0f.cloudfront.net/310519663509022194/fqTiwKMMFBcdmhrMEyWGCi/Untitleddesign_159d8bf6.png" 
+                    alt="Hirix" 
+                    className="h-5 w-auto"
+                  />
                   <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                    Hirix
                   </span>
                 </div>
               ) : null}

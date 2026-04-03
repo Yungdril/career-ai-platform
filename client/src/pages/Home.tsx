@@ -19,11 +19,13 @@ export default function Home() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
         <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-accent-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">CareerAI</span>
+          <div className="flex items-center gap-3">
+            <img 
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663509022194/fqTiwKMMFBcdmhrMEyWGCi/Untitleddesign_159d8bf6.png" 
+              alt="Hirix" 
+              className="h-8 w-auto"
+            />
+            <span className="text-xl font-bold text-foreground">Hirix</span>
           </div>
           <a href={getLoginUrl()}>
             <Button size="sm" variant="default">
@@ -38,10 +40,10 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">
-              Advance Your Career with <span className="text-accent">AI Power</span>
+              Welcome to <span className="text-accent">Hirix</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Get hired faster with AI-powered resume analysis, interview preparation, and LinkedIn optimization. All in one elegant platform.
+              Your AI-powered career companion. Get hired faster with intelligent resume analysis, interview preparation, and LinkedIn optimization—all in one platform.
             </p>
           </div>
 
