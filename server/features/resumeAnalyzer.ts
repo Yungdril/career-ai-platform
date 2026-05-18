@@ -76,6 +76,34 @@ export const resumeAnalyzerRouter = router({
       }
     }),
 
+  rewriteResume: protectedProcedure
+    .input(
+      z.object({
+        originalContent: z.string(),
+        analysis: z.object({
+          strengths: z.array(z.string()),
+          improvements: z.array(z.string()),
+          missingKeywords: z.array(z.string()),
+          industryRecommendations: z.array(z.string()),
+        }),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const improvedResume = await rewriteResumeWithAI(
+          input.originalContent,
+          input.analysis
+        );
+        return {
+          success: true,
+          improvedResume,
+        };
+      } catch (error) {
+        console.error("Resume rewriting error:", error);
+        throw new Error("Failed to rewrite resume");
+      }
+    }),
+
   analyzeExisting: protectedProcedure
     .input(z.object({ resumeId: z.number() }))
     .mutation(async ({ input }) => {
@@ -88,6 +116,70 @@ export const resumeAnalyzerRouter = router({
       }
     }),
 });
+
+async function rewriteResumeWithAI(
+  originalContent: string,
+  analysis: {
+    strengths: string[];
+    improvements: string[];
+    missingKeywords: string[];
+    industryRecommendations: string[];
+  }
+) {
+  const prompt = `You are an expert resume writer and career coach. Your task is to rewrite the following resume to incorporate all the improvements and suggestions provided.
+
+Original Resume:
+${originalContent}
+
+Analysis Feedback:
+
+Strengths to Maintain:
+${analysis.strengths.map((s) => `- ${s}`).join("\n")}
+
+Improvements to Apply:
+${analysis.improvements.map((i) => `- ${i}`).join("\n")}
+
+Missing Keywords to Add:
+${analysis.missingKeywords.map((k) => `- ${k}`).join("\n")}
+
+Industry Recommendations:
+${analysis.industryRecommendations.map((r) => `- ${r}`).join("\n")}
+
+Please rewrite the resume incorporating all these improvements while maintaining the candidate's authentic voice and experience. The rewritten resume should:
+1. Keep all the candidate's real experiences and achievements
+2. Improve formatting and structure for ATS compatibility
+3. Add the missing keywords naturally throughout
+4. Apply all suggested improvements
+5. Follow industry best practices
+6. Be ready for immediate submission
+
+Return ONLY the improved resume text, no explanations or markdown formatting.`;
+
+  const response = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an expert resume writer. Rewrite resumes to be more impactful, ATS-friendly, and professional while maintaining authenticity.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+
+  try {
+    const content = response.choices[0]?.message.content;
+    if (typeof content === "string") {
+      return content;
+    }
+    return "";
+  } catch (error) {
+    console.error("Failed to rewrite resume:", error);
+    return originalContent;
+  }
+}
 
 async function analyzeResumeWithAI(resumeContent: string) {
   const prompt = `You are an expert resume reviewer and ATS (Applicant Tracking System) specialist. Analyze the following resume and provide:
@@ -105,7 +197,7 @@ ${resumeContent}
 Provide your analysis in a structured JSON format.`;
 
   // Set worker for PDF processing
-  if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
+  if (typeof pdfjsLib.GlobalWorkerOptions !== "undefined") {
     pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
   }
 

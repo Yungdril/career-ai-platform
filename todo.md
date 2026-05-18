@@ -24,6 +24,8 @@
 - [x] Add download/export functionality
 - [x] Fix file upload and mutation integration
 - [x] Add error handling and loading states
+- [x] Add AI-powered resume rewriting feature
+- [x] Add improved resume download functionality
 
 ## Phase 5: AI Interview Preparation
 - [x] Create job role input interface
