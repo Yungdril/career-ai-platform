@@ -63,7 +63,11 @@ export const resumeAnalyzerRouter = router({
 
         return {
           success: true,
-          analysis,
+          score: analysis.atsScore,
+          atsScore: analysis.atsScore,
+          strengths: analysis.strengths,
+          improvements: analysis.improvements,
+          analysis: `## Resume Analysis Report\n\n### ATS Score: ${analysis.atsScore}/100\n\n### Strengths\n${analysis.strengths.map((s: string) => `- ${s}`).join("\n")}\n\n### Missing Keywords\n${analysis.missingKeywords.map((k: string) => `- ${k}`).join("\n")}\n\n### Formatting Issues\n${analysis.formattingIssues.map((f: string) => `- ${f}`).join("\n")}\n\n### Improvements\n${analysis.improvements.map((i: string) => `- ${i}`).join("\n")}\n\n### Industry Recommendations\n${analysis.industryRecommendations.map((r: string) => `- ${r}`).join("\n")}`,
         };
       } catch (error) {
         console.error("Resume upload error:", error);
@@ -98,6 +102,11 @@ Resume Content:
 ${resumeContent}
 
 Provide your analysis in a structured JSON format.`;
+
+  // Set worker for PDF processing
+  if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  }
 
   const response = await invokeLLM({
     messages: [
