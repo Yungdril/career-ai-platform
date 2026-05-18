@@ -79,7 +79,7 @@ export default function ResumeAnalyzer() {
 
       await uploadMutation.mutateAsync({
         fileName: selectedFile.name,
-        fileContent: Buffer.from(fileBuffer) as any,
+        fileContent: new Uint8Array(fileBuffer),
         fileType: fileType as "pdf" | "docx",
       });
     } catch (err) {

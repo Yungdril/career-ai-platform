@@ -10,7 +10,7 @@ export const resumeAnalyzerRouter = router({
     .input(
       z.object({
         fileName: z.string(),
-        fileContent: z.instanceof(Buffer),
+        fileContent: z.instanceof(Uint8Array),
         fileType: z.enum(["pdf", "docx"]),
       })
     )
