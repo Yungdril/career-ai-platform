@@ -36,7 +36,8 @@ export const resumeAnalyzerRouter = router({
         } else {
           // For DOCX, we'll use a simple placeholder
           // In production, you'd use a library like mammoth
-          extractedText = input.fileContent.toString("utf-8");
+          const decoder = new TextDecoder();
+          extractedText = decoder.decode(input.fileContent);
         }
 
         // Upload file to S3
