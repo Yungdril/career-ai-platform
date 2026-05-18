@@ -81,10 +81,10 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-              Three Powerful Tools
+              AI-Powered Career Development Tools
             </h2>
             <p className="text-lg text-muted-foreground">
-              Everything you need to stand out to employers
+              Master your job search with intelligent resume analysis, interview preparation, and LinkedIn optimization
             </p>
           </div>
 
