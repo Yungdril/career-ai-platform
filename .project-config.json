@@ -1,0 +1,43 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://gkz1QNTX5KdD3WW.root:Nmopzi9Nf806u8xRKc5t@gateway05.us-east-1.prod.aws.tidbcloud.com:4000/fqTiwKMMFBcdmhrMEyWGCi?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": [
+    "no_db_push"
+  ],
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663509022194/fqTiwKMMFBcdmhrMEyWGCi",
+    "access_key_id": "ASIAZV3A2ECZGHV5JOZK",
+    "secret_access_key": "KvqdbPZ1NcHdYTJQ6probLPJIrBXGsBJ2TM8u8hF",
+    "session_token": "IQoJb3JpZ2luX2VjEP///////////wEaCXVzLWVhc3QtMSJIMEYCIQCrdNh0iJB+EwGuNz8Z1ms3n97dLlUOgTGDWm6Iu1qu4gIhANkuC1Ik8icoiM/BoqYJAmT9IN49ybobEOeFJunlgbCkKv8DCMf//////////wEQBBoMNjY1Mzg2MDk4ODY2IgwM6MeQ6QfQRlYplmUq0wNyaypLbW0Tsc+9wEjzjhMWQwFoVD6PQWUr/aUCgy+vt82/v2ROne37QtrVXJG2J7g7uXaovw82h0ITq5o/5KhpoX/PX+Rrbr1g4JBkm1XM8JpEkE2FAMoZdQF/u5bAM06FPMUwSvtJIMHxP5NM/gxSDHXjORHay4RFbhXd0WK+m6nTen48Ri6s4pcAQxwSMUduLaN/pnvcoH9I7NCg35u3Yo50GeJpdgUYKuBRpyowYYKUFxOTpHdeXwPADqSe9wTurE7Wv/GBzEHXOOz1Y+FYNXPJxfoCNzYaBaRLdefROB/qHocAgI8SwDiAU06OIQ49P7kRfL3+ECjCDl3tNvPVF1Bq2506dFReNuKCsiyj9szZPYVOxV1lZAR3GCMmmsA8q9fDzlucsc2MOoYjMOln7+JkrBxYcA3kqVPT2FdvF6qyXIimnfNE/WGEO51mblHlKyuFtss4dlqNemwXIF1kvlBAp1/jl1F9iQBCmdTPX9VuUq0/XIUt/f0tGqABQ9aQJiY4+/35TwdIJfJEOz25JrH0qeQdYCeXWEdtVM5OPmRvj+WGh22+cGzEufHND+JwGSQM8TMA/fHgoPB0vt8P8PpFMvRk9ufZteGPwjb0cTRVeTCAoK7QBjqcAVMM3g6yG8gIjBQh8+QjsmJXIQZPic66zC+uve+Jd98M/eVfhWH6XPbC6GQhv+x6IBb/pKny3cmeydSH/UnMuv8qeDLtdO204YDUd+Sxsu4Mi4ioppBRg1THmMgZIp74j9VnB+QqEpPgDDy75kxYkV3dPIfXeaJjUTPV89yL2Enb1gdaqpzYiN/3/CcgeMibMEB3/n+P6yu+pdcXug==",
+    "expiration": "2026-05-19T10:17:36.000Z"
+  },
+  "name": "career-ai-platform",
+  "path": "/home/ubuntu/career-ai-platform",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "3Px7LEjeR34mhPn87PaHsc",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "WonMEBUh4qqtKDzpUWE62K",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Gerald Yayra Doe",
+    "OWNER_OPEN_ID": "V3xtJa6gCgV2naicqR4ujh",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "e93b0be2-830f-4f6f-878b-ec609fa74f12",
+    "VITE_APP_ID": "fqTiwKMMFBcdmhrMEyWGCi",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663509022194/jGuOdHwndxrjgbmf.png",
+    "VITE_APP_TITLE": "Career AI Platform",
+    "VITE_FRONTEND_FORGE_API_KEY": "hzTEBomq2X5KvnFAZFDaaG",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}
