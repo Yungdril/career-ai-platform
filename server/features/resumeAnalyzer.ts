@@ -3,7 +3,7 @@ import { z } from "zod";
 import { invokeLLM } from "../_core/llm";
 import { storagePut } from "../storage";
 import { createResume } from "../db";
-const pdfParse = require("pdf-parse");
+import * as pdfjsLib from "pdfjs-dist";
 
 export const resumeAnalyzerRouter = router({
   uploadAndAnalyze: protectedProcedure
@@ -20,8 +20,15 @@ export const resumeAnalyzerRouter = router({
         let extractedText = "";
         if (input.fileType === "pdf") {
           try {
-            const pdfData = await (pdfParse as any)(input.fileContent);
-            extractedText = pdfData.text || "";
+            const pdf = await pdfjsLib.getDocument({ data: input.fileContent }).promise;
+            const pages = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              const text = textContent.items.map((item: any) => item.str).join(" ");
+              pages.push(text);
+            }
+            extractedText = pages.join("\n");
           } catch (e) {
             console.error("PDF parsing error:", e);
             extractedText = "";
