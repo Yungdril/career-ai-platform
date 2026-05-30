@@ -26,6 +26,8 @@
 - [x] Add error handling and loading states
 - [x] Add AI-powered resume rewriting feature
 - [x] Add improved resume download functionality
+- [x] Add PDF download for improved resume
+- [x] Professional PDF formatting with styling
 
 ## Phase 5: AI Interview Preparation
 - [x] Create job role input interface
