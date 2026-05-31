@@ -1,6 +1,7 @@
 import { protectedProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "../_core/llm";
+import { invokeGroqJSON } from "../_core/groq";
 import { createInterview, updateInterview } from "../db";
 
 export const interviewPrepRouter = router({
@@ -21,7 +22,7 @@ export const interviewPrepRouter = router({
           status: "draft",
         });
 
-        // Generate questions with AI
+        // Generate questions with AI (using Groq for speed)
         const questions = await generateInterviewQuestions(
           input.jobRole,
           input.industry
@@ -61,7 +62,7 @@ export const interviewPrepRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        // Generate AI feedback on answers
+        // Generate AI feedback on answers (using OpenAI for quality)
         const feedback = await generateInterviewFeedback(input.responses);
 
         // Update interview with responses and feedback
@@ -88,69 +89,71 @@ async function generateInterviewQuestions(
 ) {
   const prompt = `Generate 5 realistic and challenging interview questions for a ${jobRole} position${
     industry ? ` in the ${industry} industry` : ""
-  }. 
+  }.
 
-For each question, provide:
-1. The question itself
-2. What the interviewer is looking for
-3. Tips for answering well
+Return as JSON with this structure:
+{
+  "questions": [
+    {
+      "question": "...",
+      "whatTheyAreLookingFor": "...",
+      "tipsForAnswering": ["...", "..."]
+    }
+  ]
+}
 
 Focus on behavioral, technical (if applicable), and situational questions that are commonly asked for this role.`;
 
-  const response = await invokeLLM({
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are an expert interview coach. Generate realistic and challenging interview questions that help candidates prepare effectively.",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "interview_questions",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            questions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  question: { type: "string" },
-                  whatTheyAreLookingFor: { type: "string" },
-                  tipsForAnswering: {
-                    type: "array",
-                    items: { type: "string" },
-                  },
-                },
-                required: ["question", "whatTheyAreLookingFor", "tipsForAnswering"],
-                additionalProperties: false,
-              },
-            },
-          },
-          required: ["questions"],
-          additionalProperties: false,
-        },
-      },
-    },
-  });
-
   try {
-    const content = response.choices[0]?.message.content;
-    if (typeof content === "string") {
-      const parsed = JSON.parse(content);
-      return parsed.questions;
-    }
-    return (content as any).questions || [];
+    // Use Groq for fast question generation
+    const result = await invokeGroqJSON<{
+      questions: Array<{
+        question: string;
+        whatTheyAreLookingFor: string;
+        tipsForAnswering: string[];
+      }>;
+    }>({
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert interview coach. Generate realistic and challenging interview questions that help candidates prepare effectively. Always respond with valid JSON.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      max_tokens: 2048,
+    });
+    return result.questions;
   } catch (error) {
-    console.error("Failed to parse questions response:", error);
-    return [];
+    console.error("Failed to generate questions with Groq:", error);
+    // Fallback to OpenAI if Groq fails
+    try {
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert interview coach. Generate realistic and challenging interview questions that help candidates prepare effectively.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+      const content = response.choices[0]?.message.content;
+      if (typeof content === "string") {
+        const parsed = JSON.parse(content);
+        return parsed.questions;
+      }
+      return (content as any).questions || [];
+    } catch (fallbackError) {
+      console.error("Failed to parse questions response:", fallbackError);
+      return [];
+    }
   }
 }
 

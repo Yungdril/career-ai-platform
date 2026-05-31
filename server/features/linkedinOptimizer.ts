@@ -1,6 +1,7 @@
 import { protectedProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "../_core/llm";
+import { invokeGroqJSON } from "../_core/groq";
 import { getUserLinkedinProfile, createLinkedinProfile, updateLinkedinProfile } from "../db";
 
 export const linkedinOptimizerRouter = router({
