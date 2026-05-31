@@ -32,7 +32,7 @@ export async function invokeGroq(options: {
   const client = getGroqClient();
 
   const response = await client.chat.completions.create({
-    model: options.model || "mixtral-8x7b-32768", // Fast, powerful model
+    model: options.model || "llama-3.3-70b-versatile", // Fast, powerful model
     messages: options.messages,
     temperature: options.temperature ?? 0.7,
     max_tokens: options.max_tokens ?? 1024,
@@ -59,7 +59,7 @@ export async function invokeGroqJSON<T>(options: {
   const client = getGroqClient();
 
   const response = await client.chat.completions.create({
-    model: options.model || "mixtral-8x7b-32768",
+    model: options.model || "llama-3.3-70b-versatile",
     messages: options.messages,
     temperature: options.temperature ?? 0.7,
     max_tokens: options.max_tokens ?? 2048,
