@@ -4,17 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getLoginUrl } from "@/const";
 import { FileText, Briefcase, Linkedin, ArrowRight, CheckCircle2, Sparkles, Zap, Shield } from "lucide-react";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && !hasNavigated.current) {
+      hasNavigated.current = true;
       navigate("/dashboard");
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user]);
 
   if (isAuthenticated && user) {
     return null;
