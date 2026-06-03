@@ -1,8 +1,9 @@
-import { COOKIE_NAME } from "@shared/const";
+import { getDb } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { COOKIE_NAME } from "@shared/const";
 import {
   getUserResumes,
   createResume,
@@ -20,6 +21,9 @@ import {
 import { resumeAnalyzerRouter } from "./features/resumeAnalyzer";
 import { interviewPrepRouter } from "./features/interviewPrep";
 import { linkedinOptimizerRouter } from "./features/linkedinOptimizer";
+import { authRouter } from "./features/authRoutes";
+import { profileRouter } from "./features/profileRoutes";
+import { historyRouter } from "./features/historyRoutes";
 
 export const appRouter = router({
   system: systemRouter,
@@ -32,10 +36,11 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    ...authRouter._def.procedures,
   }),
 
-
-
+  profile: profileRouter,
+  history: historyRouter,
   linkedinOptimizer: linkedinOptimizerRouter,
   resumeAnalyzer: resumeAnalyzerRouter,
   interviewPrep: interviewPrepRouter,
